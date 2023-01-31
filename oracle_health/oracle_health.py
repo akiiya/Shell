@@ -74,6 +74,7 @@ def res_consume(url_list):
 
     response = manager.urlopen('GET', url, preload_content=False)
     download_size = 0
+    print_counter = 0
     last_timestamp = time.time()
 
     while True:
@@ -94,14 +95,26 @@ def res_consume(url_list):
         # if shape_time < 1:
         #    time.sleep(1 - shape_time)
 
+        print_counter += 1
         download_size += len(chunk)
         del chunk
         gc.collect()
+
+        if print_counter == 100:
+            print('[{t}] - 已完成: {x}mb'.format(
+                t=last_timestamp,
+                x=download_size / 1000 / 1000
+            ))
+            print_counter = 0
+
         last_timestamp = time.time()
+
+        '''
         print('[{t}] - 已完成: {x}mb'.format(
             t=last_timestamp,
             x=download_size / 1000 / 1000
         ))
+        '''
 
     response.release_conn()
 
