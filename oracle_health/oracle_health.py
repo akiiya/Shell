@@ -103,7 +103,7 @@ def res_consume(url_list):
         del chunk
         gc.collect()
 
-        if print_counter == 2:
+        if print_counter == 50:
             print('[{t}] - 已完成: {x}mb'.format(
                 t=last_timestamp,
                 x=download_size / 1000 / 1000
