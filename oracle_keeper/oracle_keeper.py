@@ -1,5 +1,6 @@
 import gc
 import os
+import random
 import time
 import codecs
 
@@ -44,11 +45,8 @@ def mem_consume():
 
 
 # 消耗cpu资源,计算斐波那契数列
-def cpu_consume(s_m):
-    if s_m == 's':
-        num = 2000000
-    else:
-        num = 200000
+def cpu_consume():
+    num = random.randint(150000, 250000)
     n1, n2 = 0, 1
     count = 0
     while count < num:
@@ -72,7 +70,7 @@ def res_consume():
         if not chunk:
             break
 
-        cpu_consume('m')
+        cpu_consume()
 
         shape_time = time.time() - last_timestamp
 
