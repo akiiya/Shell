@@ -1,9 +1,8 @@
-import datetime
+
 import gc
 import os
 import time
 import codecs
-import random
 
 import urllib3
 import traceback
@@ -12,8 +11,7 @@ from io import BytesIO
 max_speed_mbs = 1  # 最大下载速度 mb/s
 max_memory_mb = 1024 * 3  # 内存占用上限
 pid_file_path = 'oracle_keeper.pid'
-large_file_list_path = 'large_file_list.txt'
-large_file_list_url_path = 'https://raw.githubusercontent.com/akiiya/Shell/master/oracle_keeper/large_file_list.txt'
+download_url_path = 'http://cachefly.cachefly.net/100mb.test'
 
 mem_file = BytesIO()
 
@@ -32,32 +30,6 @@ def read_pid():
             return f.read()
     else:
         return None
-
-
-def read_url_list():
-    url_list = []
-    if not os.path.exists(large_file_list_path):
-        response = manager.request('GET', large_file_list_url_path)
-        response_text = response.data
-        response.release_conn()
-        line_list = response_text.decode('utf-8').split('\n')
-    else:
-        with codecs.open(large_file_list_path, 'rb') as f:
-            line_list = f.readlines()
-
-    for line in line_list:
-        line = str(line)
-        line = line.strip()
-        if not line:
-            continue
-        if line.startswith('#'):
-            continue
-        if not line.startswith('http'):
-            continue
-        url_list.append(line)
-
-    return url_list
-
 
 # 消耗内存资源
 def mem_consume():
@@ -87,10 +59,9 @@ def cpu_consume(s_m):
     return 1
 
 
-def res_consume(url_list):
-    url = url_list[random.randint(0, len(url_list))]
-    print(f'开始下载url : {url}')
-    response = manager.urlopen('GET', url, preload_content=False)
+def res_consume():
+    print(f'开始下载url : {download_url_path}')
+    response = manager.urlopen('GET', download_url_path, preload_content=False)
     download_size = 0
     print_counter = 0
     last_timestamp = time.time()
@@ -134,7 +105,7 @@ def res_consume(url_list):
         '''
 
     response.release_conn()
-    print(f'url下载完成 : {url}')
+    print(f'url下载完成 : {download_url_path}')
 
 
 def run_process():
@@ -144,10 +115,9 @@ def run_process():
     save_pid()
 
     mem_consume()
-    url_list = read_url_list()
     while True:
         try:
-            res_consume(url_list)
+            res_consume()
         except:
             traceback.print_exc()
             time.sleep(30)
