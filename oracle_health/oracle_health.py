@@ -1,3 +1,4 @@
+import datetime
 import gc
 import os
 import time
@@ -15,7 +16,8 @@ large_file_list_url_path = 'https://raw.githubusercontent.com/akiiya/Shell/maste
 
 mem_file = BytesIO()
 
-manager = urllib3.PoolManager()
+timeout = urllib3.Timeout(connect=20, read=30)
+manager = urllib3.PoolManager(timeout=timeout)
 
 
 def read_url_list():
@@ -85,13 +87,12 @@ def res_consume(url_list):
         if not chunk:
             break
 
-        while True:  # 多余的时间去消耗cpu
-            cpu_consume('m')
-            shape_time = time.time() - last_timestamp
-            if shape_time < 1:
-                continue
-            else:
-                break
+        cpu_consume('m')
+
+        shape_time = time.time() - last_timestamp
+
+        if shape_time < 1:
+            time.sleep(1 - shape_time)
 
         # 降低下载速度
         # if shape_time < 1:
@@ -102,7 +103,7 @@ def res_consume(url_list):
         del chunk
         gc.collect()
 
-        if print_counter == 100:
+        if print_counter == 2:
             print('[{t}] - 已完成: {x}mb'.format(
                 t=last_timestamp,
                 x=download_size / 1000 / 1000
