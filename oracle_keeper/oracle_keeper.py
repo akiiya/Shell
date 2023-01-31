@@ -1,4 +1,3 @@
-
 import gc
 import os
 import time
@@ -30,6 +29,7 @@ def read_pid():
             return f.read()
     else:
         return None
+
 
 # 消耗内存资源
 def mem_consume():
@@ -115,11 +115,14 @@ def run_process():
     save_pid()
 
     mem_consume()
+
     while True:
         try:
             res_consume()
         except:
             traceback.print_exc()
+            time.sleep(10)
+        else:
             time.sleep(30)
 
 
