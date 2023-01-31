@@ -11,6 +11,7 @@ from io import BytesIO
 
 max_speed_mbs = 1  # 最大下载速度 mb/s
 max_memory_mb = 1024 * 3  # 内存占用上限
+pid_file_path = 'oracle_health.pid'
 large_file_list_path = 'large_file_list.txt'
 large_file_list_url_path = 'https://raw.githubusercontent.com/akiiya/Shell/master/oracle_health/large_file_list.txt'
 
@@ -18,6 +19,19 @@ mem_file = BytesIO()
 
 timeout = urllib3.Timeout(connect=20, read=30)
 manager = urllib3.PoolManager(timeout=timeout)
+
+
+def save_pid():
+    with codecs.open(pid_file_path, 'wb', encoding='utf-8') as f:
+        f.write(str(os.getpid()))
+
+
+def read_pid():
+    if os.path.exists(pid_file_path):
+        with codecs.open(pid_file_path, 'rb', encoding='utf-8') as f:
+            return f.read()
+    else:
+        return None
 
 
 def read_url_list():
@@ -124,6 +138,11 @@ def res_consume(url_list):
 
 
 def run_process():
+    old_pid = read_pid()
+    if old_pid:
+        os.system("kill -9 " + old_pid)
+    save_pid()
+
     mem_consume()
     url_list = read_url_list()
     while True:
