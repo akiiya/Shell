@@ -1,4 +1,5 @@
 import gc
+import os
 import time
 import codecs
 import random
@@ -9,23 +10,36 @@ from io import BytesIO
 
 max_speed_mbs = 1  # 最大下载速度 mb/s
 max_memory_mb = 1024 * 3  # 内存占用上限
-large_file_list = 'large_file_list.txt'
+large_file_list_path = 'large_file_list.txt'
+large_file_list_url_path = 'https://raw.githubusercontent.com/akiiya/Shell/master/oracle_health/large_file_list.txt'
 
 mem_file = BytesIO()
+
+manager = urllib3.PoolManager()
 
 
 def read_url_list():
     url_list = []
-    with codecs.open(large_file_list, 'rb') as f:
-        for line in f.readlines():
-            line = line.strip()
-            if not line:
-                continue
-            if line.startswith(b'#'):
-                continue
-            if not line.startswith(b'http'):
-                continue
-            url_list.append(line)
+    if not os.path.exists(large_file_list_path):
+        response = manager.request('GET', large_file_list_url_path)
+        response_text = response.data
+        response.release_conn()
+        line_list = response_text.decode('utf-8').split('\n')
+    else:
+        with codecs.open(large_file_list_path, 'rb') as f:
+            line_list = f.readlines()
+
+    for line in line_list:
+        line = str(line)
+        line = line.strip()
+        if not line:
+            continue
+        if line.startswith('#'):
+            continue
+        if not line.startswith('http'):
+            continue
+        url_list.append(line)
+
     return url_list
 
 
@@ -58,8 +72,7 @@ def cpu_consume(s_m):
 def res_consume(url_list):
     url = url_list[random.randint(0, len(url_list))]
 
-    manager = urllib3.PoolManager()
-    response = manager.urlopen('GET', url.decode('utf-8'), preload_content=False)
+    response = manager.urlopen('GET', url, preload_content=False)
     download_size = 0
     last_timestamp = time.time()
 
@@ -94,7 +107,7 @@ def res_consume(url_list):
 
 
 def run_process():
-    mem_consume()
+    # mem_consume()
     url_list = read_url_list()
     while True:
         try:
