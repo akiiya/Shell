@@ -107,7 +107,7 @@ def res_consume(url_list):
 
 
 def run_process():
-    # mem_consume()
+    mem_consume()
     url_list = read_url_list()
     while True:
         try:
