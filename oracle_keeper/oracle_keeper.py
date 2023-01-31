@@ -15,8 +15,11 @@ download_url_path = 'http://cachefly.cachefly.net/100mb.test'
 
 mem_file = BytesIO()
 
+headers = {
+    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36'
+}
 timeout = urllib3.Timeout(connect=20, read=30)
-manager = urllib3.PoolManager(timeout=timeout)
+manager = urllib3.PoolManager(timeout=timeout, headers=headers)
 
 
 def save_pid():
@@ -46,7 +49,7 @@ def mem_consume():
 
 # 消耗cpu资源,计算斐波那契数列
 def cpu_consume():
-    num = random.randint(150000, 250000)
+    num = random.randint(170000, 250000)
     n1, n2 = 0, 1
     count = 0
     while count < num:
@@ -59,10 +62,10 @@ def cpu_consume():
 
 def res_consume():
     print(f'开始下载url : {download_url_path}')
-    response = manager.urlopen('GET', download_url_path, preload_content=False)
-    download_size = 0
-    print_counter = 0
+
+    response = manager.request('GET', download_url_path, preload_content=False)
     last_timestamp = time.time()
+    download_size = 0
 
     while True:
         chunk = response.read(max_speed_mbs * 1000 * 1000)
@@ -77,30 +80,11 @@ def res_consume():
         if shape_time < 1:
             time.sleep(1 - shape_time)
 
-        # 降低下载速度
-        # if shape_time < 1:
-        #    time.sleep(1 - shape_time)
-
-        print_counter += 1
         download_size += len(chunk)
         del chunk
         gc.collect()
 
-        if print_counter == 50:
-            print('[{t}] - 已完成: {x}mb'.format(
-                t=last_timestamp,
-                x=download_size / 1000 / 1000
-            ))
-            print_counter = 0
-
         last_timestamp = time.time()
-
-        '''
-        print('[{t}] - 已完成: {x}mb'.format(
-            t=last_timestamp,
-            x=download_size / 1000 / 1000
-        ))
-        '''
 
     response.release_conn()
     print(f'url下载完成 : {download_url_path}')
@@ -121,7 +105,7 @@ def run_process():
             traceback.print_exc()
             time.sleep(10)
         else:
-            time.sleep(30)
+            time.sleep(3)
 
 
 run_process()
