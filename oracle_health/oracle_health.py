@@ -45,12 +45,14 @@ def read_url_list():
 
 # 消耗内存资源
 def mem_consume():
+    print('开始填充内存: {max_memory_mb}MB')
     while True:
         # 消耗内存
         if mem_file.tell() < max_memory_mb * 1024 * 1024:
             mem_file.write(b'0' * 1024)
         else:
             break
+    print(f'内存填充完成: {max_memory_mb}MB')
 
 
 # 消耗cpu资源,计算斐波那契数列
@@ -71,7 +73,7 @@ def cpu_consume(s_m):
 
 def res_consume(url_list):
     url = url_list[random.randint(0, len(url_list))]
-
+    print(f'开始下载url : {url}')
     response = manager.urlopen('GET', url, preload_content=False)
     download_size = 0
     print_counter = 0
@@ -117,6 +119,7 @@ def res_consume(url_list):
         '''
 
     response.release_conn()
+    print(f'url下载完成 : {url}')
 
 
 def run_process():
