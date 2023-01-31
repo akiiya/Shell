@@ -45,7 +45,7 @@ def read_url_list():
 
 # 消耗内存资源
 def mem_consume():
-    print('开始填充内存: {max_memory_mb}MB')
+    print(f'开始填充内存: {max_memory_mb}MB')
     while True:
         # 消耗内存
         if mem_file.tell() < max_memory_mb * 1024 * 1024:
