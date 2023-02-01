@@ -10,8 +10,8 @@ import urllib3
 from io import BytesIO
 from configparser import ConfigParser
 
-# conf_file_path = 'config.ini'
-# pid_file_path = 'oracle_keeper.pid'
+# conf_file_path = 'conf/config.ini'
+# pid_file_path = 'conf/oracle_keeper.pid'
 
 pid_file_path = '/var/run/oracle_keeper.pid'
 conf_file_path = '/etc/oracle_keeper/config.ini'
