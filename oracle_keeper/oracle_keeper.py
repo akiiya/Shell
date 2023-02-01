@@ -59,6 +59,11 @@ def read_conf():
         conf.set('mem', 'enable', '1')
         conf.set('mem', 'memory_gb', '3')
 
+        conf_root = os.path.dirname(conf_file_path)
+
+        if not os.path.exists(conf_root):
+            os.makedirs(conf_root)
+
         with codecs.open(conf_file_path, "wb", encoding=u'utf-8-sig') as fp:
             conf.write(fp)
     else:
