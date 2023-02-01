@@ -10,10 +10,12 @@ import urllib3
 from io import BytesIO
 from configparser import ConfigParser
 
-# pid_file_path = '/var/run/oracle_keeper.pid'
-# conf_file_path = '/etc/oracle_keeper/config.ini'
-pid_file_path = 'oracle_keeper.pid'
-conf_file_path = 'config.ini'
+# conf_file_path = 'config.ini'
+# pid_file_path = 'oracle_keeper.pid'
+
+pid_file_path = '/var/run/oracle_keeper.pid'
+conf_file_path = '/etc/oracle_keeper/config.ini'
+
 download_url_path = 'http://cachefly.cachefly.net/100mb.test'
 
 mem_file = BytesIO()
@@ -39,12 +41,14 @@ def read_conf():
     conf = ConfigParser()  # 需要实例化一个ConfigParser对象
     if not os.path.exists(conf_file_path):
         conf.add_section('cpu')
+        conf.set('cpu', 'enable', '1')
         conf.set('cpu', 'round_count', '3600')  # 每一轮执行次数
         conf.set('cpu', 'interval_hour', '2')
         conf.set('cpu', 'interval_minute', '0')
         conf.set('cpu', 'interval_second', '0')
 
         conf.add_section('net')
+        conf.set('net', 'enable', '1')
         conf.set('net', 'interval_hour', '2')
         conf.set('net', 'interval_minute', '0')
         conf.set('net', 'interval_second', '0')
@@ -52,6 +56,7 @@ def read_conf():
         conf.set('net', 'round_size_gb', '3')  # 每一轮下载的数据总量GB
 
         conf.add_section('mem')
+        conf.set('mem', 'enable', '1')
         conf.set('mem', 'memory_gb', '3')
 
         with codecs.open(conf_file_path, "wb", encoding=u'utf-8-sig') as fp:
@@ -171,15 +176,18 @@ def main_consume():
     close_older()
     conf = read_conf()
 
+    mem_enable = conf.getint('mem', 'enable')
     memory_gb = conf.getint('mem', 'memory_gb')
 
+    cpu_enable = conf.getint('cpu', 'enable')
     cpu_round_count = conf.getint('cpu', 'round_count')
     cpu_interval_hour = conf.getint('cpu', 'interval_hour')
     cpu_interval_minute = conf.getint('cpu', 'interval_minute')
     cpu_interval_second = conf.getint('cpu', 'interval_second')
 
-    max_speed_mb = conf.getint('net', 'max_speed_mb')  # 限速每秒
-    round_size_gb = conf.getint('net', 'round_size_gb')  # 每轮下载数据总量
+    net_enable = conf.getint('net', 'enable')
+    net_max_speed_mb = conf.getint('net', 'max_speed_mb')  # 限速每秒
+    net_round_size_gb = conf.getint('net', 'round_size_gb')  # 每轮下载数据总量
     net_interval_hour = conf.getint('net', 'interval_hour')
     net_interval_minute = conf.getint('net', 'interval_minute')
     net_interval_second = conf.getint('net', 'interval_second')
@@ -187,7 +195,7 @@ def main_consume():
     cpu_interval = cpu_interval_hour * 60 * 60 + cpu_interval_minute * 60 + cpu_interval_second
     net_interval = net_interval_hour * 60 * 60 + net_interval_minute * 60 + net_interval_second
 
-    if memory_gb:
+    if mem_enable:
         threading.Thread(
             target=mem_consume,
             kwargs={
@@ -195,7 +203,7 @@ def main_consume():
             }
         ).start()
 
-    if cpu_interval:
+    if cpu_enable:
         threading.Thread(
             target=cpu_consume,
             kwargs={
@@ -204,13 +212,13 @@ def main_consume():
             }
         ).start()
 
-    if net_interval:
+    if net_enable:
         threading.Thread(
             target=net_consume,
             kwargs={
                 'interval': net_interval,
-                'max_speed_mb': max_speed_mb,
-                'round_size_gb': round_size_gb
+                'max_speed_mb': net_max_speed_mb,
+                'round_size_gb': net_round_size_gb
             }
         ).start()
 
@@ -220,8 +228,8 @@ def main_consume():
 
 def test_consume():
     # cpu_consume(100, round_count=10)
-    # net_consume(100, round_size_gb=1, max_speed_mb=10)
-    mem_consume(2)
+    net_consume(100, round_size_gb=1, max_speed_mb=100)
+    # mem_consume(2)
     exit()
 
 
