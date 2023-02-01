@@ -23,7 +23,6 @@ uninstall() {
 }
 
 RunScript() {
-  echo "执行操作：$1"
   if [ "$1" = "install" ]; then
     install
   elif [ "$1" = "update" ]; then
