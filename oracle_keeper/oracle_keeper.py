@@ -10,7 +10,7 @@ from io import BytesIO
 
 max_speed_mbs = 1  # 最大下载速度 mb/s
 max_memory_mb = 1024 * 3  # 内存占用上限
-pid_file_path = 'oracle_keeper.pid'
+pid_file_path = '/var/run/oracle_keeper.pid'
 download_url_path = 'http://cachefly.cachefly.net/100mb.test'
 
 mem_file = BytesIO()
@@ -108,4 +108,5 @@ def run_process():
             time.sleep(3)
 
 
-run_process()
+if __name__ == '__main__':
+    run_process()
