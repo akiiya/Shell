@@ -49,7 +49,7 @@ def mem_consume():
 
 # 消耗cpu资源,计算斐波那契数列
 def cpu_consume():
-    num = random.randint(150000, 250000)
+    num = random.randint(100000, 250000)
     n1, n2 = 0, 1
     count = 0
     while count < num:
