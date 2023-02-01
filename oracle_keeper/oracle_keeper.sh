@@ -22,7 +22,7 @@ uninstall() {
   systemctl daemon-reload
 }
 
-runMain() {
+RunScript() {
   echo "$1"
   if [ "$1" = "install" ]; then
     install
@@ -35,4 +35,4 @@ runMain() {
   fi
 }
 
-runMain
+RunScript $1
