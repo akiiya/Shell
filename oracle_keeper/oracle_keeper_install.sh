@@ -5,5 +5,6 @@ wget  -N --no-check-certificate https://raw.githubusercontent.com/akiiya/Shell/m
 wget  -N --no-check-certificate https://raw.githubusercontent.com/akiiya/Shell/master/oracle_keeper/oracle_keeper.service -O /usr/lib/systemd/system/oracle_keeper.service
 systemctl daemon-reload
 systemctl enable oracle_keeper
+systemctl start oracle_keeper
 
 #nohup python3 oracle_keeper.py > /dev/null 2>&1 &
