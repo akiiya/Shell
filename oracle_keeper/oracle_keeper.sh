@@ -23,6 +23,7 @@ uninstall() {
 }
 
 runMain() {
+  echo "$1"
   if [ "$1" = "install" ]; then
     install
   elif [ "$1" = "update" ]; then
