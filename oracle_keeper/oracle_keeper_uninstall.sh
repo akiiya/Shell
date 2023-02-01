@@ -1,3 +1,5 @@
+#!/bin/bash
+
 systemctl stop oracle_keeper
 systemctl disable oracle_keeper
 rm -rf /usr/local/oracle_keeper
