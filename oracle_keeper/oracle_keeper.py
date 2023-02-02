@@ -115,8 +115,7 @@ def cpu_consume(interval, **kwargs):
         else:
             print(f'本轮cpu消耗结束')
             time.sleep(interval)
-            print(f'开始本轮cpu消耗')
-            round_count = kwargs.get('round_count', 60 * 60)
+            round_count = None
 
 
 # 消耗网络资源,下载文件
